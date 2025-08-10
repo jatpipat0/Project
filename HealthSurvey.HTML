@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Booking & Health Survey</title>
+<style>
+    body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
+    h2 { background: #00a0e3; color: white; padding: 10px; }
+    form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 400px; margin-bottom: 30px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px; width: 100%; background: #00a0e3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #008ac0; }
+    .error { color: red; font-size: 0.9em; margin-top: 3px; }
+    textarea { resize: vertical; }
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 8px; text-align: center; max-width: 300px; }
+</style>
+</head>
+<body>
+
+
+<h2>2. ฟอร์มแบบสอบถามสุขภาพ (Health Survey)</h2>
+<form id="healthForm">
+    <label>อายุ:</label>
+    <input type="number" id="age">
+    <div class="error" id="ageError"></div>
+
+    <label>เพศ:</label>
+    <input type="radio" name="gender" value="ชาย"> ชาย
+    <input type="radio" name="gender" value="หญิง"> หญิง
+    <div class="error" id="genderError"></div>
+
+    <label>น้ำหนัก (กก.):</label>
+    <input type="number" id="weight" step="0.1">
+    <div class="error" id="weightError"></div>
+
+    <label>ส่วนสูง (ซม.):</label>
+    <input type="number" id="height" step="0.1">
+    <div class="error" id="heightError"></div>
+
+    <label><input type="checkbox" id="hasDisease"> มีโรคประจำตัว</label>
+    <textarea id="diseaseDetail" placeholder="ระบุโรคประจำตัว" style="display:none;"></textarea>
+    <div class="error" id="diseaseError"></div>
+
+    <button type="submit">ส่งแบบสอบถาม</button>
+</form>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+    <div class="modal-content" id="modalContent"></div>
+</div>
+
+<script>
+    // ฟังก์ชันเปิด Modal
+    function showModal(message) {
+        document.getElementById("modalContent").innerHTML = message + "<br><br><button onclick='closeModal()'>ปิด</button>";
+        document.getElementById("modal").style.display = "flex";
+    }
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
+    }
+
+    
+    // ===== Health Survey Form =====
+    document.getElementById("hasDisease").addEventListener("change", function() {
+        document.getElementById("diseaseDetail").style.display = this.checked ? "block" : "none";
+    });
+
+    document.getElementById("healthForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        let valid = true;
+
+        let age = parseInt(document.getElementById("age").value);
+        let gender = document.querySelector("input[name='gender']:checked");
+        let weight = parseFloat(document.getElementById("weight").value);
+        let height = parseFloat(document.getElementById("height").value);
+        let hasDisease = document.getElementById("hasDisease").checked;
+        let diseaseDetail = document.getElementById("diseaseDetail").value.trim();
+
+        document.querySelectorAll("#healthForm .error").forEach(el => el.innerHTML = "");
+
+        if (isNaN(age) || age < 15 || age > 60) {
+            document.getElementById("ageError").innerText = "อายุต้องอยู่ระหว่าง 15-60 ปี";
+            valid = false;
+        }
+        if (!gender) {
+            document.getElementById("genderError").innerText = "กรุณาเลือกเพศ";
+            valid = false;
+        }
+        if (isNaN(weight) || weight <= 0) {
+            document.getElementById("weightError").innerText = "น้ำหนักต้องเป็นค่าบวก";
+            valid = false;
+        }
+        if (isNaN(height) || height <= 0) {
+            document.getElementById("heightError").innerText = "ส่วนสูงต้องเป็นค่าบวก";
+            valid = false;
+        }
+        if (hasDisease && diseaseDetail === "") {
+            document.getElementById("diseaseError").innerText = "กรุณาระบุโรคประจำตัว";
+            valid = false;
+        }
+
+        if (valid) {
+            let bmi = weight / Math.pow(height/100, 2);
+            let category = "";
+            if (bmi < 18.5) category = "น้ำหนักน้อย";
+            else if (bmi < 25) category = "ปกติ";
+            else if (bmi < 30) category = "น้ำหนักเกิน";
+            else category = "อ้วน";
+
+            showModal(`ค่า BMI = ${bmi.toFixed(2)} (${category})`);
+        }
+    });
+</script>
+
+</body>
+</html>

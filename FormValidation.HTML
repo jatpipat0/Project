@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>มจพ16 คำร้องขอโอนย้ายสาขาวิชาต่างคณะ</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    body {
+        background: linear-gradient(to right, #dfe9f3, #ffffff);
+        font-family: "Prompt", sans-serif;
+    }
+    .form-container {
+        max-width: 700px;
+        background: white;
+        padding: 25px;
+        margin: 40px auto;
+        border-radius: 12px;
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+        color: #0d6efd;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>มจพ16 คำร้องขอโอนย้ายสาขาวิชาต่างคณะ</h2>
+    <form id="transferForm" onsubmit="return validateForm()">
+
+        <div class="mb-3">
+            <label class="form-label">ชื่อ-นามสกุล</label>
+            <input type="text" class="form-control" id="name" placeholder="ชื่อ-นามสกุล" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">รหัสนักศึกษา</label>
+            <input type="text" class="form-control" id="studentId" placeholder="" required>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">คณะเดิม</label>
+                <select class="form-select" id="currentFaculty" required>
+                    <option value="">-- เลือกคณะเดิม --</option>
+                    <option>วิศวกรรมศาสตร์</option>
+                    <option>วิทยาศาสตร์</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">สาขาวิชาเดิม</label>
+                <input type="text" class="form-control" id="currentProgram" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">คณะใหม่</label>
+                <select class="form-select" id="newFaculty" required>
+                    <option value="">-- เลือกคณะใหม่ --</option>
+                    <option>วิศวกรรมศาสตร์</option>
+                    <option>วิทยาศาสตร์</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">สาขาวิชาใหม่</label>
+                <input type="text" class="form-control" id="newProgram" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">เหตุผลการโอนย้าย</label>
+            <textarea class="form-control" id="reason" rows="3" maxlength="500" required></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">เบอร์ติดต่อ</label>
+                <input type="text" class="form-control" id="phone" placeholder="" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">อีเมล</label>
+                <input type="email" class="form-control" id="email" placeholder="" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">ไฟล์แนบ (PDF/JPG/PNG ≤ 5MB)</label>
+            <input type="file" class="form-control" id="attachment" accept=".pdf,.jpg,.png" required>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">ส่งคำร้อง</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+function validateForm() {
+    let name = document.getElementById("name").value.trim();
+    let studentId = document.getElementById("studentId").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let currentFaculty = document.getElementById("currentFaculty").value;
+    let newFaculty = document.getElementById("newFaculty").value;
+    let attachment = document.getElementById("attachment").files[0];
+
+    const namePattern = /^[ก-๙\s]+$/;
+    const idPattern = /^\d{8,10}$/;
+    const phonePattern = /^0\d{9}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!namePattern.test(name)) {
+        alert("กรุณากรอกชื่อ-นามสกุลเป็นภาษาไทยเท่านั้น");
+        return false;
+    }
+    if (!idPattern.test(studentId)) {
+        alert("รหัสนักศึกษาต้องเป็นตัวเลข 8-10 หลัก");
+        return false;
+    }
+    if (currentFaculty === newFaculty) {
+        alert("คณะใหม่ต้องไม่ซ้ำกับคณะเดิม");
+        return false;
+    }
+    if (!phonePattern.test(phone)) {
+        alert("เบอร์โทรต้องเป็นตัวเลข 10 หลัก และขึ้นต้นด้วย 0");
+        return false;
+    }
+    if (!emailPattern.test(email)) {
+        alert("รูปแบบอีเมลไม่ถูกต้อง");
+        return false;
+    }
+    if (attachment) {
+        const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+        if (!allowedTypes.includes(attachment.type)) {
+            alert("อนุญาตเฉพาะไฟล์ PDF, JPG, PNG เท่านั้น");
+            return false;
+        }
+        if (attachment.size > 5 * 1024 * 1024) {
+            alert("ขนาดไฟล์ต้องไม่เกิน 5MB");
+            return false;
+        }
+    }
+    alert("ส่งคำร้องสำเร็จ!");
+    return true;
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

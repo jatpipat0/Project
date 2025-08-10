@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Booking</title>
+<style>
+    body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
+    h2 { background: #00a0e3; color: white; padding: 10px; }
+    form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 400px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px; width: 100%; background: #00a0e3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #008ac0; }
+    .error { color: red; font-size: 0.9em; margin-top: 3px; }
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 8px; text-align: center; max-width: 300px; }
+</style>
+</head>
+<body>
+
+<h2>ฟอร์มจองตั๋วกิจกรรม (Event Booking)</h2>
+<form id="eventForm">
+    <label>ชื่อ-นามสกุล:</label>
+    <input type="text" id="fullname">
+    <div class="error" id="nameError"></div>
+
+    <label>เบอร์โทรศัพท์:</label>
+    <input type="text" id="phone">
+    <div class="error" id="phoneError"></div>
+
+    <label>ประเภทตั๋ว:</label>
+    <select id="ticketType">
+        <option value="">--เลือกประเภทตั๋ว--</option>
+        <option value="ปกติ">ปกติ</option>
+        <option value="VIP">VIP</option>
+        <option value="Premium">Premium</option>
+    </select>
+    <div class="error" id="typeError"></div>
+
+    <label>จำนวนตั๋ว:</label>
+    <input type="number" id="ticketCount">
+    <div class="error" id="countError"></div>
+
+    <button type="submit">จองตั๋ว</button>
+</form>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+    <div class="modal-content" id="modalContent"></div>
+</div>
+
+<script>
+    // ฟังก์ชันเปิด Modal
+    function showModal(message) {
+        document.getElementById("modalContent").innerHTML = message + "<br><br><button onclick='closeModal()'>ปิด</button>";
+        document.getElementById("modal").style.display = "flex";
+    }
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
+    }
+
+    // Event Booking Form Validation
+    document.getElementById("eventForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        let valid = true;
+
+        let name = document.getElementById("fullname").value.trim();
+        let phone = document.getElementById("phone").value.trim();
+        let type = document.getElementById("ticketType").value;
+        let count = parseInt(document.getElementById("ticketCount").value);
+
+        document.querySelectorAll("#eventForm .error").forEach(el => el.innerHTML = "");
+
+        // ตรวจสอบชื่อ-นามสกุล
+        if (name.split(" ").length < 2) {
+            document.getElementById("nameError").innerText = "กรุณากรอกชื่อ-นามสกุลอย่างน้อย 2 คำ";
+            valid = false;
+        }
+
+        // ตรวจสอบเบอร์โทร
+        if (!/^[0][0-9]{9}$/.test(phone)) {
+            document.getElementById("phoneError").innerText = "เบอร์โทรต้องเป็นตัวเลข 10 หลัก และขึ้นต้นด้วย 0";
+            valid = false;
+        }
+
+        // ตรวจสอบประเภทตั๋ว
+        if (!type) {
+            document.getElementById("typeError").innerText = "กรุณาเลือกประเภทตั๋ว";
+            valid = false;
+        }
+
+        // ตรวจสอบจำนวนตั๋ว
+        if (isNaN(count) || count < 1 || count > 5) {
+            document.getElementById("countError").innerText = "จำนวนตั๋วต้องอยู่ระหว่าง 1 ถึง 5";
+            valid = false;
+        }
+
+        // ถ้าเป็น VIP/Premium ต้องไม่เกิน 2 ใบ
+        if ((type === "VIP" || type === "Premium") && count > 2) {
+            document.getElementById("countError").innerText = "VIP/Premium ซื้อได้ไม่เกิน 2 ใบ";
+            valid = false;
+        }
+
+        // ถ้าผ่าน
+        if (valid) {
+            showModal(`จองตั๋วสำเร็จ จำนวน: ${count} ประเภท: ${type}`);
+        }
+    });
+</script>
+
+</body>
+</html>
